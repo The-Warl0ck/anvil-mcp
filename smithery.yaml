@@ -1,0 +1,20 @@
+# Smithery configuration — https://smithery.ai/docs/config#smitheryyaml
+# Lets Smithery users one-click install Anvil over stdio.
+# NOTE: after `npm publish`, switch args to ['-y', '<npm-package-name>'].
+
+startCommand:
+  type: stdio
+
+configSchema:
+  type: object
+  properties: {}
+  required: []
+
+commandFunction: |-
+  config => ({
+    command: 'npx',
+    args: ['-y', 'github:The-Warl0ck/anvil-mcp'],
+    env: {}
+  })
+
+exampleConfig: {}
