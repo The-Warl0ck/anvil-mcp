@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "description": "Local physics/chemistry bench as MCP: plain words in, 12-domain simulations out.",
+  "description": "A full workbench for agents: plain words in, the agent forges, tests, proves, and exports the design. Offline, no API key.",
   "name": "io.github.The-Warl0ck/anvil-mcp",
   "packages": [
     {
@@ -10,7 +10,7 @@
       "transport": {
         "type": "stdio"
       },
-      "version": "0.1.2"
+      "version": "0.1.3"
     }
   ],
   "repository": {
@@ -18,6 +18,6 @@
     "url": "https://github.com/The-Warl0ck/anvil-mcp"
   },
   "title": "Anvil",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "websiteUrl": "https://github.com/The-Warl0ck/anvil-mcp"
 }

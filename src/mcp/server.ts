@@ -1,8 +1,8 @@
 /**
- * anvil-mcp — Anvil physics/chemistry bench as an MCP server (stdio).
+ * anvil-mcp — a full workbench for agents, as an MCP server (stdio).
  *
- * Fully offline. No cloud, no Bridge, no API key, no LLM:
- * plain words -> offline intent kernel -> blueprint -> 12-domain solvers -> proof metrics.
+ * Fully offline. No cloud, no Bridge, no API key, no LLM.
+ * The agent runs the loop: forge -> solve -> iterate on proof metrics -> export.
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -77,7 +77,7 @@ function fail(message: string): never {
 }
 
 const server = new Server(
-  { name: "anvil-mcp", version: "0.1.0" },
+  { name: "anvil-mcp", version: "0.1.3" },
   { capabilities: { tools: {} } },
 );
 
@@ -86,13 +86,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "anvil.domains",
       description:
-        "List the 12 simulation domains Anvil supports and what each one simulates.",
+        "List the 12 simulation domains Anvil supports and what each one simulates. Call this first when you are unsure which domain fits the user's intent — then forge with anvil.forge.",
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
     },
     {
       name: "anvil.forge",
       description:
-        "Forge a simulation blueprint from a plain-language intent. Fully offline — an intent kernel maps your words to a domain schematic (nodes, edges, params), no LLM involved.",
+        "Forge a simulation blueprint from a plain-language intent. Fully offline — an intent kernel maps the words to a domain schematic (nodes, edges, params), no LLM involved. Step 1 of the workbench loop: pass the returned blueprint to anvil.solve to test it.",
       inputSchema: {
         type: "object",
         properties: {
@@ -114,7 +114,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "anvil.solve",
       description:
-        "Run the 12-domain physics solver on a blueprint and return a simulation snapshot plus proof metrics (pass/warn/fail).",
+        "Step 2 of the workbench loop: run the physics solver on a blueprint and return a simulation snapshot plus proof metrics (pass/warn/fail). If any metric warns or fails, revise the design and re-forge with anvil.forge — iterate until all metrics pass. Only then move to anvil.export.",
       inputSchema: {
         type: "object",
         properties: {
@@ -134,7 +134,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: "anvil.export",
       description:
-        "Export a blueprint's geometry as STL (ASCII) or OBJ text for 3D printing / CAD.",
+        "Step 3 of the workbench loop: export a proven blueprint's geometry as STL (ASCII) or OBJ text for 3D printing / CAD. Run this after anvil.solve reports all proof metrics passing.",
       inputSchema: {
         type: "object",
         properties: {

@@ -1,26 +1,25 @@
 # anvil-mcp
 
-**Anvil — a local physics/chemistry bench as an MCP server.**
+**Anvil — a full workbench for your agent.**
 
 No cloud. No Bridge. No API key. No LLM.
 
-Type plain words → Anvil's offline intent kernel forges a simulation blueprint →
-12-domain physics solvers run it → you get back a simulation snapshot plus proof
-metrics (pass / warn / fail).
+Plain words in — your agent forges the design, tests it against proof metrics,
+iterates until it passes, and hands you the file. You never touch a tool.
 
 ## 30 seconds
 
 ```
-you:    anvil.forge  { intent: "5-stage CMOS ring oscillator at 7nm" }
-anvil:  blueprint: silicon · 8 nodes · "Offline kernel: 5-stage ring at 7 nm, VDD 0.75 V."
+you:    "I need a 5-stage CMOS ring oscillator at 7nm — prove it works
+         before I print anything."
 
-you:    anvil.solve  { blueprint }
-anvil:  [pass] Joule power = 0.0089 W — I²R on the extracted net.
-        [pass] Junction temperature = 21.85 °C — lumped thermal node per device, 300 K ambient.
-        [pass] EM MTTF (Black) = 1.58e15 yr — Black's equation, Ea = 0.9 eV, worst via.
+agent:  anvil.forge  → blueprint: silicon · 8 nodes · "5-stage ring at 7 nm, VDD 0.75 V."
+        anvil.solve  → [pass] Joule power · [pass] junction temp · [warn] EM margin thin
+        anvil.forge  → widens the vias, re-forges
+        anvil.solve  → all metrics pass
+        anvil.export → 532 triangles of ASCII STL
 
-you:    anvil.export { blueprint, format: "stl" }
-anvil:  532 triangles of ASCII STL, ready for a slicer.
+you get: the printable file, plus the proof it works.
 ```
 
 ## Install
