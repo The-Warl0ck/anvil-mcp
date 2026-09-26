@@ -10,7 +10,7 @@
       "transport": {
         "type": "stdio"
       },
-      "version": "0.1.3"
+      "version": "0.1.4"
     }
   ],
   "repository": {
@@ -18,6 +18,6 @@
     "url": "https://github.com/The-Warl0ck/anvil-mcp"
   },
   "title": "Anvil",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "websiteUrl": "https://github.com/The-Warl0ck/anvil-mcp"
 }

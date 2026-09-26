@@ -126,6 +126,7 @@ export class MechanicalSolver implements Solver {
     const fAnalytic = L > 0 ? ((1.875 ** 2) / (2 * Math.PI)) * Math.sqrt(E * I / (mu * L ** 4)) : 0;
     const smax = Math.max(0, ...this.bp.edges.map((e) => this.stress.get(e.id) ?? 0));
     const yieldSi = 1.2e9;
+    const badLoad = !(smax > 0) || !isFinite(smax);
     const sf = smax > 0 ? yieldSi / smax : 99;
     const tipY = this.y.get(tip.id) ?? 0;
     return [
@@ -158,9 +159,11 @@ export class MechanicalSolver implements Solver {
         label: "Safety factor",
         value: sf,
         unit: "",
-        status: sf > 4 ? "pass" : sf > 1.5 ? "warn" : "fail",
+        status: badLoad ? "fail" : sf > 4 ? "pass" : sf > 1.5 ? "warn" : "fail",
         limit: 4,
-        note: "Poly-Si yield 1.2 GPa vs peak bending stress.",
+        note: badLoad
+          ? "Non-physical peak stress (≤0 or NaN) — safety factor is meaningless; fix inputs."
+          : "Poly-Si yield 1.2 GPa vs peak bending stress.",
       },
       {
         id: "s",

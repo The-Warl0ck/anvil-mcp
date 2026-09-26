@@ -122,6 +122,9 @@ export class MachinesSolver implements Solver {
     const stroke = 2 * r;
     const mean = (2 * stroke * this.rpm) / 60;
     const steel = 3.5e8;
+    // Non-positive or NaN peak stress is non-physical — fail loudly, never
+    // map it to a comforting sf = 99.
+    const badLoad = !(this.peakS > 0) || !isFinite(this.peakS);
     const sf = this.peakS > 0 ? steel / this.peakS : 99;
     return [
       {
@@ -146,17 +149,21 @@ export class MachinesSolver implements Solver {
         label: "Peak rod stress",
         value: this.peakS,
         unit: "Pa",
-        status: sf < 2 ? "fail" : sf < 4 ? "warn" : "pass",
-        note: "σ = F_rod / (π d²/4), F_rod = F_gas / cosφ. Gas load P·A·max(cosθ,0).",
+        status: badLoad ? "fail" : sf < 2 ? "fail" : sf < 4 ? "warn" : "pass",
+        note: badLoad
+          ? "Non-physical peak stress (≤0 or NaN) — check load path / params."
+          : "σ = F_rod / (π d²/4), F_rod = F_gas / cosφ. Gas load P·A·max(cosθ,0).",
       },
       {
         id: "sf",
         label: "Rod safety factor",
         value: sf,
         unit: "",
-        status: sf < 2 ? "fail" : sf < 4 ? "warn" : "pass",
+        status: badLoad ? "fail" : sf < 2 ? "fail" : sf < 4 ? "warn" : "pass",
         limit: 4,
-        note: "Against 350 MPa (mild steel). Not fatigue / Goodman.",
+        note: badLoad
+          ? "Non-physical load — safety factor is meaningless; fix inputs."
+          : "Against 350 MPa (mild steel). Not fatigue / Goodman.",
       },
       {
         id: "F",
@@ -183,6 +190,7 @@ export class MachinesSolver implements Solver {
     const y = 0.154 - 0.912 / z1;
     const sigma = Ft / Math.max(1e-8, bW * mod * Math.max(y, 0.05));
     const steel = 2.0e8;
+    const badLoad = !(sigma > 0) || !isFinite(sigma);
     const sf = sigma > 0 ? steel / sigma : 99;
     return [
       {
@@ -198,17 +206,21 @@ export class MachinesSolver implements Solver {
         label: "Lewis bending σ",
         value: sigma,
         unit: "Pa",
-        status: sf < 1.5 ? "fail" : sf < 2.5 ? "warn" : "pass",
-        note: "σ = Ft / (b m Y), Y ≈ 0.154 − 0.912/z. First-pass tooth root.",
+        status: badLoad ? "fail" : sf < 1.5 ? "fail" : sf < 2.5 ? "warn" : "pass",
+        note: badLoad
+          ? "Non-physical bending stress (≤0 or NaN) — check torque / geometry."
+          : "σ = Ft / (b m Y), Y ≈ 0.154 − 0.912/z. First-pass tooth root.",
       },
       {
         id: "sf",
         label: "Tooth safety factor",
         value: sf,
         unit: "",
-        status: sf < 1.5 ? "fail" : sf < 2.5 ? "warn" : "pass",
+        status: badLoad ? "fail" : sf < 1.5 ? "fail" : sf < 2.5 ? "warn" : "pass",
         limit: 2.5,
-        note: "Against 200 MPa allowable (untreated steel). No AGMA K factors.",
+        note: badLoad
+          ? "Non-physical load — safety factor is meaningless; fix inputs."
+          : "Against 200 MPa allowable (untreated steel). No AGMA K factors.",
       },
       {
         id: "Ft",
@@ -230,6 +242,7 @@ export class MachinesSolver implements Solver {
     const E = p.params.E ?? 2.3e9;
     const sigma = (6 * F * L) / Math.max(1e-12, b * t * t);
     const ys = p.params.ys ?? 4.0e7;
+    const badLoad = !(sigma > 0) || !isFinite(sigma);
     const sf = sigma > 0 ? ys / sigma : 99;
     const wallMm = t * 1000;
     const overhang = p.params.overhang ?? 0;
@@ -239,17 +252,21 @@ export class MachinesSolver implements Solver {
         label: "Bending stress",
         value: sigma,
         unit: "Pa",
-        status: sf < 2 ? "fail" : sf < 3 ? "warn" : "pass",
-        note: "σ = 6FL / bt² for a cantilevered part. Print orientation assumed load in-plane.",
+        status: badLoad ? "fail" : sf < 2 ? "fail" : sf < 3 ? "warn" : "pass",
+        note: badLoad
+          ? "Non-physical bending stress (≤0 or NaN) — check load / dimensions."
+          : "σ = 6FL / bt² for a cantilevered part. Print orientation assumed load in-plane.",
       },
       {
         id: "sf",
         label: "Safety factor",
         value: sf,
         unit: "",
-        status: sf < 2 ? "fail" : sf < 3 ? "warn" : "pass",
+        status: badLoad ? "fail" : sf < 2 ? "fail" : sf < 3 ? "warn" : "pass",
         limit: 3,
-        note: `YS ${ys} Pa (default PLA-ish 40 MPa unless ys set).`,
+        note: badLoad
+          ? "Non-physical load — safety factor is meaningless; fix inputs."
+          : `YS ${ys} Pa (default PLA-ish 40 MPa unless ys set).`,
       },
       {
         id: "wall",

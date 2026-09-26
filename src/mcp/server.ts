@@ -77,7 +77,7 @@ function fail(message: string): never {
 }
 
 const server = new Server(
-  { name: "anvil-mcp", version: "0.1.3" },
+  { name: "anvil-mcp", version: "0.1.4" },
   { capabilities: { tools: {} } },
 );
 
@@ -104,7 +104,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           domain: {
             type: "string",
             enum: DOMAIN_IDS,
-            description: "Optional domain hint; otherwise the kernel picks from the intent text.",
+            description: "Optional domain — when provided it is honored over keyword scoring; otherwise the kernel picks from the intent text.",
           },
         },
         required: ["intent"],
@@ -162,9 +162,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const hint = typeof a.domain === "string" && (DOMAIN_IDS as string[]).includes(a.domain)
           ? (a.domain as Domain)
           : "mechanical";
-        const read = readIntent(intent as string, hint);
+        // An explicitly passed domain is honored over keyword scoring;
+        // without one the kernel picks from the intent text (hint = fallback).
+        const explicit = typeof a.domain === "string" && (DOMAIN_IDS as string[]).includes(a.domain)
+          ? (a.domain as Domain)
+          : undefined;
+        const read = readIntent(intent as string, hint, explicit);
         const current: Blueprint = blankBlueprint(read.domain);
-        const { blueprint, rationale } = forgeOffline(intent as string, current);
+        const { blueprint, rationale } = forgeOffline(intent as string, current, explicit);
         return ok({
           intent: {
             domain: read.domain,

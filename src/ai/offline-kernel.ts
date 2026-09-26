@@ -33,14 +33,16 @@ export interface IntentRead {
   scores: Record<Domain, number>;
 }
 
-export function readIntent(text: string, fallback: Domain): IntentRead {
+export function readIntent(text: string, fallback: Domain, explicit?: Domain): IntentRead {
   const lower = text.toLowerCase();
   const scores = {} as Record<Domain, number>;
   (Object.keys(DOMAIN_KW) as Domain[]).forEach((d) => {
     scores[d] = DOMAIN_KW[d].reduce((s, k) => s + (lower.includes(k) ? 12 : 0), 0);
   });
   const ranked = (Object.entries(scores) as [Domain, number][]).sort((a, b) => b[1] - a[1]);
-  const domain = ranked[0][1] >= 12 ? ranked[0][0] : fallback;
+  // An explicitly named domain is an instruction, not a hint: honor it over
+  // keyword scoring (which can misfire on substrings, e.g. "ev" in "cantilever").
+  const domain = explicit ?? (ranked[0][1] >= 12 ? ranked[0][0] : fallback);
 
   const num = (re: RegExp) => {
     const m = lower.match(re);
@@ -62,8 +64,8 @@ export function readIntent(text: string, fallback: Domain): IntentRead {
   };
 }
 
-export function forgeOffline(prompt: string, current: Blueprint): { blueprint: Blueprint; rationale: string } {
-  const read = readIntent(prompt, current.domain);
+export function forgeOffline(prompt: string, current: Blueprint, explicit?: Domain): { blueprint: Blueprint; rationale: string } {
+  const read = readIntent(prompt, current.domain, explicit);
   if (read.mutate && read.domain === current.domain) {
     return mutateBench(current, prompt, read);
   }
