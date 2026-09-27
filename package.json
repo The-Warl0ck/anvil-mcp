@@ -25,7 +25,7 @@
     "prepare": "npm run build"
   },
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "devDependencies": {
     "@types/node": "^26.6.3",
     "typescript": "^5.9.3"

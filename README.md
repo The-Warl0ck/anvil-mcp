@@ -2,7 +2,7 @@
 
 **Anvil — a full workbench for your agent.**
 
-No cloud. No Bridge. No API key. No LLM.
+No cloud. No Bridge. No API key. No LLM inside — the tools are pure computation; your agent host brings the thinking.
 
 Plain words in — your agent forges the design, tests it against proof metrics,
 iterates until it passes, and hands you the file. You never touch a tool.
@@ -60,7 +60,7 @@ Add to your `claude_desktop_config.json`:
 | Tool | Input | Output |
 |---|---|---|
 | `anvil.domains` | `{}` | The 12 domains and what each simulates |
-| `anvil.forge` | `{ intent, domain? }` | Blueprint JSON + rationale (offline, no LLM) |
+| `anvil.forge` | `{ intent, domain? }` | Blueprint JSON + rationale (offline — no LLM in the tool itself) |
 | `anvil.solve` | `{ blueprint, steps? }` | SimSnapshot + ProofMetric[] with real numbers |
 | `anvil.export` | `{ blueprint, format }` | STL (ASCII) or OBJ text for 3D printing / CAD |
 

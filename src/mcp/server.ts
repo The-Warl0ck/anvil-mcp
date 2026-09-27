@@ -1,7 +1,7 @@
 /**
  * anvil-mcp — a full workbench for agents, as an MCP server (stdio).
  *
- * Fully offline. No cloud, no Bridge, no API key, no LLM.
+ * Fully offline. No cloud, no Bridge, no API key, no LLM inside — pure computation; the agent host brings the thinking.
  * The agent runs the loop: forge -> solve -> iterate on proof metrics -> export.
  */
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -77,7 +77,7 @@ function fail(message: string): never {
 }
 
 const server = new Server(
-  { name: "anvil-mcp", version: "0.1.4" },
+  { name: "anvil-mcp", version: "0.1.5" },
   { capabilities: { tools: {} } },
 );
 
