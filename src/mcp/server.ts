@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * anvil-mcp — a full workbench for agents, as an MCP server (stdio).
  *
